@@ -30,7 +30,7 @@ FROM customers
 
 -- COMMAND ----------
 
---SELECT from_json(profile) AS profile_struct FROM customers;
+-- SELECT from_json(profile) AS profile_struct FROM customers;
 
 -- COMMAND ----------
 
@@ -131,7 +131,7 @@ SELECT * FROM orders_enriched
 -- COMMAND ----------
 
 CREATE OR REPLACE TEMP VIEW orders_updates
-AS SELECT * FROM parquet.`${dataset.bookstore}/orders-new`;
+AS SELECT * FROM parquet.`dbfs:/Volumes/dbricks/default/bookstore_dataset/orders-new`;
 
 SELECT * FROM orders 
 UNION 
@@ -172,3 +172,7 @@ SELECT * FROM (
 );
 
 SELECT * FROM transactions
+
+-- COMMAND ----------
+
+

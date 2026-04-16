@@ -18,6 +18,12 @@ SET datasets.path=dbfs:/mnt/demo-datasets/bookstore;
 
 -- COMMAND ----------
 
+-- MAGIC %python
+-- MAGIC dataset_bookstore = f"dbfs:/Volumes/dbricks/default/bookstore_dataset"
+-- MAGIC checkpoints_bookstore = f"dbfs:/Volumes/dbricks/default/bookstore_checkpoints"
+
+-- COMMAND ----------
+
 -- MAGIC %md
 -- MAGIC ## Bronze Layer Tables
 
@@ -30,7 +36,7 @@ SET datasets.path=dbfs:/mnt/demo-datasets/bookstore;
 
 CREATE OR REFRESH STREAMING LIVE TABLE orders_raw
 COMMENT "The raw books orders, ingested from orders-raw"
-AS SELECT * FROM cloud_files("${datasets.path}/orders-json-raw", "json",
+AS SELECT * FROM cloud_files("dbfs:/Volumes/dbricks/default/bookstore_dataset/orders-json-raw", "json",
                              map("cloudFiles.inferColumnTypes", "true"))
 
 -- COMMAND ----------
@@ -42,7 +48,7 @@ AS SELECT * FROM cloud_files("${datasets.path}/orders-json-raw", "json",
 
 CREATE OR REFRESH LIVE TABLE customers
 COMMENT "The customers lookup table, ingested from customers-json"
-AS SELECT * FROM json.`${datasets.path}/customers-json`
+AS SELECT * FROM json.`dbfs:/Volumes/dbricks/default/bookstore_dataset/customers-json`
 
 -- COMMAND ----------
 
@@ -99,13 +105,9 @@ AS
 -- COMMAND ----------
 
 CREATE OR REFRESH LIVE TABLE fr_daily_customer_books
-COMMENT "Daily number of books per customer in France"
+COMMENT "Daily number of books per customer in China"
 AS
   SELECT customer_id, f_name, l_name, date_trunc("DD", order_timestamp) order_date, sum(quantity) books_counts
   FROM LIVE.orders_cleaned
   WHERE country = "France"
   GROUP BY customer_id, f_name, l_name, date_trunc("DD", order_timestamp)
-
--- COMMAND ----------
-
-

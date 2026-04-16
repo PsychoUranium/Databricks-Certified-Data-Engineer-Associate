@@ -1,5 +1,11 @@
 -- Databricks notebook source
-SET datasets.path=dbfs:/mnt/demo-datasets/bookstore;
+SET datasets.path=dbfs:/Volumes/dbricks/default/bookstore_dataset;
+
+-- COMMAND ----------
+
+-- MAGIC %python
+-- MAGIC dataset_bookstore = f"dbfs:/Volumes/dbricks/default/bookstore_dataset"
+-- MAGIC checkpoints_bookstore = f"dbfs:/Volumes/dbricks/default/bookstore_checkpoints"
 
 -- COMMAND ----------
 
@@ -13,7 +19,7 @@ SET datasets.path=dbfs:/mnt/demo-datasets/bookstore;
 
 CREATE OR REFRESH STREAMING LIVE TABLE books_bronze
 COMMENT "The raw books data, ingested from CDC feed"
-AS SELECT * FROM cloud_files("${datasets.path}/books-cdc", "json")
+AS SELECT * FROM cloud_files("dbfs:/Volumes/dbricks/default/bookstore_dataset/books-cdc", "json")
 
 -- COMMAND ----------
 

@@ -47,8 +47,8 @@ else:
     data_catalog = spark.sql("SELECT current_catalog()").collect()[0][0]
     dataset_volume_name = "bookstore_dataset"
     checkpoints_volume_name = "bookstore_checkpoints"
-    dataset_bookstore = f"/Volumes/{data_catalog}/{db_name}/{dataset_volume_name}"
-    checkpoints_bookstore = f"/Volumes/{data_catalog}/{db_name}/{checkpoints_volume_name}"
+    dataset_bookstore = f"dbfs:/Volumes/dbricks/default/bookstore_dataset"
+    checkpoints_bookstore = f"dbfs:/Volumes/dbricks/default/bookstore_checkpoints"
 
     spark.sql(f"USE CATALOG {data_catalog}")
     spark.sql(f"CREATE SCHEMA IF NOT EXISTS {db_name}")

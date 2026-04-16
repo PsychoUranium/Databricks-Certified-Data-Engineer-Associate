@@ -11,8 +11,12 @@
 
 -- COMMAND ----------
 
+"dbfs:/Volumes/dbricks/default/bookstore_dataset/customers-json/export_001.json"
+
+-- COMMAND ----------
+
 CREATE TABLE orders AS
-SELECT * FROM parquet.`${dataset.bookstore}/orders`
+SELECT * FROM parquet.`dbfs:/Volumes/dbricks/default/bookstore_dataset/orders`
 
 -- COMMAND ----------
 
@@ -26,7 +30,7 @@ SELECT * FROM orders
 -- COMMAND ----------
 
 CREATE OR REPLACE TABLE orders AS
-SELECT * FROM parquet.`${dataset.bookstore}/orders`
+SELECT * FROM parquet.`dbfs:/Volumes/dbricks/default/bookstore_dataset/orders`
 
 -- COMMAND ----------
 
@@ -68,7 +72,7 @@ SELECT count(*) FROM orders
 -- COMMAND ----------
 
 CREATE OR REPLACE TEMP VIEW customers_updates AS 
-SELECT * FROM json.`${dataset.bookstore}/customers-json-new`;
+SELECT * FROM json.`dbfs:/Volumes/dbricks/default/bookstore_dataset/customers-json-new`;
 
 MERGE INTO customers c
 USING customers_updates u
@@ -83,7 +87,7 @@ CREATE OR REPLACE TEMP VIEW books_updates
    (book_id STRING, title STRING, author STRING, category STRING, price DOUBLE)
 USING CSV
 OPTIONS (
-  path = "${dataset.bookstore}/books-csv-new",
+  path = "dbfs:/Volumes/dbricks/default/bookstore_dataset/books-csv-new",
   header = "true",
   delimiter = ";"
 );
@@ -97,3 +101,7 @@ USING books_updates u
 ON b.book_id = u.book_id AND b.title = u.title
 WHEN NOT MATCHED AND u.category = 'Computer Science' THEN 
   INSERT *
+
+-- COMMAND ----------
+
+

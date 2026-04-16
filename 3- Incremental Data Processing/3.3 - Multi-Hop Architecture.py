@@ -7,6 +7,11 @@
 
 # COMMAND ----------
 
+dataset_bookstore = f"dbfs:/Volumes/dbricks/default/bookstore_dataset"
+checkpoints_bookstore = f"dbfs:/Volumes/dbricks/default/bookstore_checkpoints"
+
+# COMMAND ----------
+
 # MAGIC %run ../Includes/Copy-Datasets
 
 # COMMAND ----------
@@ -191,3 +196,7 @@ for s in spark.streams.active:
     print("Stopping stream: " + s.id)
     s.stop()
     s.awaitTermination()
+
+# COMMAND ----------
+
+

@@ -7,6 +7,11 @@
 
 # COMMAND ----------
 
+dataset_bookstore = f"dbfs:/Volumes/dbricks/default/bookstore_dataset"
+checkpoints_bookstore = f"dbfs:/Volumes/dbricks/default/bookstore_checkpoints"
+
+# COMMAND ----------
+
 # MAGIC %run ../Includes/Copy-Datasets
 
 # COMMAND ----------
@@ -98,3 +103,7 @@ display(files)
 # COMMAND ----------
 
 dbutils.fs.rm(f"{checkpoints_bookstore}/orders", True)
+
+# COMMAND ----------
+
+

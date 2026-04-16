@@ -7,7 +7,17 @@
 
 # COMMAND ----------
 
+# MAGIC %sql
+# MAGIC restore table books to version as of 1
+
+# COMMAND ----------
+
 # MAGIC %run ../Includes/Copy-Datasets
+
+# COMMAND ----------
+
+dataset_bookstore = f"dbfs:/Volumes/dbricks/default/bookstore_dataset"
+checkpoints_bookstore = f"dbfs:/Volumes/dbricks/default/bookstore_checkpoints"
 
 # COMMAND ----------
 
@@ -31,7 +41,7 @@
 # COMMAND ----------
 
 books_streaming_df = spark.sql("SELECT * FROM books_streaming_tmp_vw")
-display(books_streaming_df, checkpointLocation = f"{checkpoints_bookstore}/tmp/books_streaming_{time.time()}")
+display(books_streaming_df, checkpointLocation = f"dbfs:/Volumes/dbricks/default/bookstore_checkpoints/tmp/books_streaming_{time.time()}")
 
 # COMMAND ----------
 
@@ -74,7 +84,7 @@ sorted_books_df = books_streaming_df.orderBy("author")
 # MAGIC CREATE OR REPLACE TEMP VIEW author_counts_tmp_vw AS (
 # MAGIC   SELECT author, count(book_id) AS total_books
 # MAGIC   FROM books_streaming_tmp_vw
-# MAGIC   GROUP BY author
+# MAGIC   GROUP BY author order by 1 desc
 # MAGIC )
 
 # COMMAND ----------
@@ -83,7 +93,7 @@ sorted_books_df = books_streaming_df.orderBy("author")
       .writeStream  
       .trigger(processingTime='4 seconds')
       .outputMode("complete")
-      .option("checkpointLocation", f"{checkpoints_bookstore}/author_counts")
+      .option("checkpointLocation", f"{checkpoints_bookstore}/author_counts_v1")
       .toTable("author_counts")
 )
 
@@ -114,6 +124,11 @@ sorted_books_df = books_streaming_df.orderBy("author")
 # COMMAND ----------
 
 # MAGIC %sql
+# MAGIC select * from books
+
+# COMMAND ----------
+
+# MAGIC %sql
 # MAGIC INSERT INTO books
 # MAGIC values ("B16", "Hands-On Deep Learning Algorithms with Python", "Sudharsan Ravichandiran", "Computer Science", 25),
 # MAGIC         ("B17", "Neural Network Methods in Natural Language Processing", "Yoav Goldberg", "Computer Science", 30),
@@ -125,7 +140,7 @@ sorted_books_df = books_streaming_df.orderBy("author")
       .writeStream           
       .trigger(availableNow=True)
       .outputMode("complete")
-      .option("checkpointLocation", f"{checkpoints_bookstore}/author_counts")
+      .option("checkpointLocation", f"{checkpoints_bookstore}/author_counts_v1")
       .toTable("author_counts")
       .awaitTermination()
 )
@@ -135,3 +150,7 @@ sorted_books_df = books_streaming_df.orderBy("author")
 # MAGIC %sql
 # MAGIC SELECT *
 # MAGIC FROM author_counts
+
+# COMMAND ----------
+
+

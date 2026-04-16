@@ -17,30 +17,38 @@
 -- COMMAND ----------
 
 -- MAGIC %python
+-- MAGIC print(f"{dataset_bookstore}")
+
+-- COMMAND ----------
+
+-- MAGIC %python
 -- MAGIC files = dbutils.fs.ls(f"{dataset_bookstore}/customers-json")
 -- MAGIC display(files)
 
 -- COMMAND ----------
 
-SELECT * FROM json.`${dataset.bookstore}/customers-json/export_001.json`
+SELECT * FROM json.`dbfs:/Volumes/dbricks/default/bookstore_dataset/customers-json/export_001.json`
 
 -- COMMAND ----------
 
-SELECT * FROM json.`${dataset.bookstore}/customers-json/export_*.json`
+SELECT * FROM json.`dbfs:/Volumes/dbricks/default/bookstore_dataset/customers-json/export_*.json`
 
 -- COMMAND ----------
 
-SELECT * FROM json.`${dataset.bookstore}/customers-json`
+SELECT * FROM json.`dbfs:/Volumes/dbricks/default/bookstore_dataset/customers-json`
 
 -- COMMAND ----------
 
-SELECT count(*) FROM json.`${dataset.bookstore}/customers-json`
+SELECT count(*) FROM json.`dbfs:/Volumes/dbricks/default/bookstore_dataset/customers-json`
 
 -- COMMAND ----------
 
  SELECT *,
-    input_file_name() source_file
-  FROM json.`${dataset.bookstore}/customers-json`;
+   _metadata.file_path source_file,
+    _metadata.file_size,
+    _metadata.file_name,
+    _metadata.file_modification_time
+  FROM json.`dbfs:/Volumes/dbricks/default/bookstore_dataset/customers-json`;
 
 -- COMMAND ----------
 
@@ -49,7 +57,7 @@ SELECT count(*) FROM json.`${dataset.bookstore}/customers-json`
 
 -- COMMAND ----------
 
-SELECT * FROM text.`${dataset.bookstore}/customers-json`
+SELECT * FROM text.`dbfs:/Volumes/dbricks/default/bookstore_dataset/customers-json`
 
 -- COMMAND ----------
 
@@ -58,7 +66,7 @@ SELECT * FROM text.`${dataset.bookstore}/customers-json`
 
 -- COMMAND ----------
 
-SELECT * FROM binaryFile.`${dataset.bookstore}/customers-json`
+SELECT * FROM binaryFile.`dbfs:/Volumes/dbricks/default/bookstore_dataset/customers-json`
 
 -- COMMAND ----------
 
@@ -68,7 +76,7 @@ SELECT * FROM binaryFile.`${dataset.bookstore}/customers-json`
 
 -- COMMAND ----------
 
-SELECT * FROM csv.`${dataset.bookstore}/books-csv`
+SELECT * FROM csv.`dbfs:/Volumes/dbricks/default/bookstore_dataset/books-csv`
 
 -- COMMAND ----------
 
@@ -81,7 +89,7 @@ SELECT * FROM csv.`${dataset.bookstore}/books-csv`
 -- COMMAND ----------
 
 -- MAGIC %python
--- MAGIC dbutils.widgets.text("external_location", '<EXTERNAL-URL>/external_storage')
+-- MAGIC dbutils.widgets.text("external_location", 's3://dbricks-associate/dbricks/')
 -- MAGIC
 -- MAGIC external_location = dbutils.widgets.get("external_location")
 -- MAGIC dbutils.fs.cp(f"{dataset_bookstore}/books-csv", f"{external_location}/books-csv", recurse=True)
@@ -95,7 +103,7 @@ OPTIONS (
   header = "true",
   delimiter = ";"
 )
-LOCATION "${external_location}/books-csv"
+LOCATION "s3://dbricks-associate/dbricks/books-csv/"
 
 -- COMMAND ----------
 
@@ -141,7 +149,7 @@ SELECT COUNT(*) FROM books_csv
 
 -- COMMAND ----------
 
-REFRESH TABLE books_csv
+REFRESH TABLE dbricks.default.books_csv
 
 -- COMMAND ----------
 
@@ -155,14 +163,14 @@ SELECT COUNT(*) FROM books_csv
 -- COMMAND ----------
 
 CREATE TABLE customers AS
-SELECT * FROM json.`${dataset.bookstore}/customers-json`;
+SELECT * FROM json.`dbfs:/Volumes/dbricks/default/bookstore_dataset/customers-json`;
 
 DESCRIBE EXTENDED customers;
 
 -- COMMAND ----------
 
 CREATE TABLE books_unparsed AS
-SELECT * FROM csv.`${dataset.bookstore}/books-csv`;
+SELECT * FROM csv.`dbfs:/Volumes/dbricks/default/bookstore_dataset/books-csv`;
 
 SELECT * FROM books_unparsed;
 
@@ -172,7 +180,7 @@ CREATE TEMP VIEW books_tmp_vw
    (book_id STRING, title STRING, author STRING, category STRING, price DOUBLE)
 USING CSV
 OPTIONS (
-  path = "${dataset.bookstore}/books-csv/export_*.csv",
+  path = "dbfs:/Volumes/dbricks/default/bookstore_dataset/books-csv/export_*.csv",
   header = "true",
   delimiter = ";"
 );

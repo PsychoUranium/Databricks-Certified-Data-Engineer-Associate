@@ -99,3 +99,7 @@ FROM customers
 
 DROP FUNCTION get_url;
 DROP FUNCTION site_type;
+
+-- COMMAND ----------
+
+
